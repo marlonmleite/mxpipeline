@@ -1,0 +1,58 @@
+<div class="mx-pipeline">
+  <table class="mx-stage">
+    <tbody>
+      <tr height="45">
+        <td>
+          <div class="mx-header">
+            <ul>
+              <li id="stage-{{ column[mxFieldColumnKey] }}" ng-repeat="column in mxDataProvider">
+                <span class="mx-name">{{ column["name"] }}</span>
+                <span class="mx-stage-value"><span class="mx-value">{{ vm.sumValues(column[mxFieldChildren]) | currency:'R$ ' }} <small>{{ column[mxFieldChildren] | countItem:true }}</small></span></span>
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="mx-container">
+            <table class="mx-table-content">
+              <tbody>
+                <tr>
+                  <td class="mx-stage-item" ng-repeat="column in mxDataProvider">
+                    <ul id="{{ column[mxFieldColumnKey] }}" mx-droppable>
+                      <li id="mx-pipeline-key-{{ item[mxFieldChildKey] }}" mx-id="{{ item[mxFieldChildKey] }}" class="item" ng-repeat="item in column[mxFieldChildren]" mx-draggable>
+                        <div class="mx-card">
+                          <a href="" class="mx-click-card" draggable="false">
+                            <strong>
+                              <img ng-src="{{ item[mxFieldChildIcon] === undefined ? 'img/profile_120x120.jpg' : item[mxFieldChildIcon] }}" alt="{{ item[mxFieldChildName] }}" class="mx-profile-icon">
+                              {{ item[mxFieldChildName] }}
+                            </strong>
+                            <small>
+                              <span class="detail">{{ item[mxFieldChildValue] | currency:'R$ ' }}</span>
+                              <span class="detail">{{ item[mxFieldChildPartner] }}</span>
+                            </small>
+                          </a>
+                        </div>
+                        <div class="mx-icon-card" draggable="false" ng-class="{'state-0': item[mxFieldChildState] == '0', 'state-1': item[mxFieldChildState] == 1, 'state-2': item[mxFieldChildState] == 2, 'state-3': item[mxFieldChildState] == 3, 'state-4': item[mxFieldChildState] == 4}">
+                          <a id="activity-item-click" href="" class="icon" ng-click="vm.stateClickHandler($event, item[mxFieldChildKey])"></a>
+                        </div>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div id="mx-stage-actions" class="">
+              <ul class="mx-stage-action">
+                <li class="mx-trash" mx-droppable-action mx-droppable-type="trash"><span></span></li>
+                <li class="mx-lose" mx-droppable-action mx-droppable-type="lose"><span>Perdido</span></li>
+                <li class="mx-win" mx-droppable-action mx-droppable-type="win"><span>Ganho</span></li>
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
