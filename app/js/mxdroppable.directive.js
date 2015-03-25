@@ -22,10 +22,6 @@ angular.module('mxPipeline')
           		e.preventDefault();
           	}
 
-            stageAction = document.getElementById('mx-stage-actions');
-
-            angular.element(stageAction).addClass('open');
-
           	this.classList.add('over');
 
 
@@ -60,11 +56,8 @@ angular.module('mxPipeline')
           	var fromParentId = e.dataTransfer.getData('parentId');
       			var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
       			var itemId = angular.element(itemDrop).attr('mx-id');
-            var stageAction = document.getElementById('mx-stage-actions');
 
             this.classList.remove('over');
-
-            angular.element(stageAction).removeClass('open');
 
             if (this.id == fromParentId) {
               return;
@@ -78,7 +71,7 @@ angular.module('mxPipeline')
 
           	DataProvider.moveRecord(fromParentId, this.id, itemId);
 
-          	controller.onDropHandler(itemId);
+          	controller.onDropHandler(itemId, e);
 
           	return false;
           },

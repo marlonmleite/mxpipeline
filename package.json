@@ -1,6 +1,12 @@
 {
+  "author": "Marlon Maxwel",
   "name": "mx-pipeline",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marlonmleite/mxpipeline.git"
+  },
+  "bugs": "https://github.com/marlonmleite/mxpipeline/issues",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-autoprefixer": "^1.0.0",

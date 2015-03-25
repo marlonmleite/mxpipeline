@@ -55,14 +55,13 @@ angular.module('mxPipeline')
           'drop', 
           function(e) {
           	var fromParent = document.getElementById(e.dataTransfer.getData('parentId'));
-			var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
-      		var itemId = angular.element(itemDrop).attr('mx-id');
-      		var fromParentId = e.dataTransfer.getData('parentId');
+			      var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
+      		  var itemId = angular.element(itemDrop).attr('mx-id');
+      		  var fromParentId = e.dataTransfer.getData('parentId');
 
             this.classList.remove('over');
-            this.classList.remove('open');
 
-      		if (e.stopPropagation) {
+        		if (e.stopPropagation) {
           		e.stopPropagation();
           	}
 
@@ -70,9 +69,9 @@ angular.module('mxPipeline')
 
           	DataProvider.removeRecord(fromParentId, itemId);
 
-          	console.log(DataProvider.get());
+          	controller.onDropActionHandler(itemId, scope.mxDroppableType, e);
 
-          	//controller.onDropHandler(itemId);
+            controller.updateDataprovider();
 
           	return false;
           },

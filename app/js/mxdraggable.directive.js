@@ -12,6 +12,7 @@ angular.module('mxPipeline')
       link: function postLink(scope, element, attrs, controller) {
         var elem = element[0];
         var itemId;
+        var stageAction = document.getElementById('mx-stage-actions');
 
         elem.draggable = true;
 
@@ -23,6 +24,7 @@ angular.module('mxPipeline')
             e.dataTransfer.setData('elementId', this.id);
 
             this.classList.add('drag');
+            angular.element(stageAction).addClass('open');
 
             return false;
           },
@@ -33,6 +35,9 @@ angular.module('mxPipeline')
           'dragend',
           function(e) {
             this.classList.remove('drag');
+
+            angular.element(stageAction).removeClass('open');
+
             return false;
           },
           false
@@ -43,7 +48,7 @@ angular.module('mxPipeline')
           function(e){
             itemId = angular.element(this).attr('mx-id');
 
-            controller.itemClickHandler(itemId);
+            controller.itemClickHandler(itemId, e);
 
             return false;
           },

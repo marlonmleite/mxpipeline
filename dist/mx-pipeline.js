@@ -1,3 +1,11 @@
+/*
+ * mx-pipeline
+ * Version: 0.0.1 - 2015-03-24
+ * Repository: https://github.com/marlonmleite/mxpipeline.git 
+ * Bugs: https://github.com/marlonmleite/mxpipeline/issues
+ * Author: Marlon Maxwel
+ */
+
 angular.module('mxPipeline.templates', []).run(['$templateCache', function($templateCache) {
   $templateCache.put("template/mxpipeline.tpl.html",
     "<div class=mx-pipeline><table class=mx-stage><tbody><tr height=45><td><div class=mx-header><ul><li id=\"stage-{{ column[mxFieldColumnKey] }}\" ng-repeat=\"column in mxDataProvider\"><span class=mx-name>{{ column[\"name\"] }}</span> <span class=mx-stage-value><span class=mx-value>{{ vm.sumValues(column[mxFieldChildren]) | currency:'R$ ' }} <small>{{ column[mxFieldChildren] | countItem:true }}</small></span></span></li></ul></div></td></tr><tr><td><div class=mx-container><table class=mx-table-content><tbody><tr><td class=mx-stage-item ng-repeat=\"column in mxDataProvider\"><ul id=\"{{ column[mxFieldColumnKey] }}\" mx-droppable><li id=\"mx-pipeline-key-{{ item[mxFieldChildKey] }}\" mx-id=\"{{ item[mxFieldChildKey] }}\" class=item ng-repeat=\"item in column[mxFieldChildren]\" mx-draggable><div class=mx-card><a href=\"\" class=mx-click-card draggable=false><strong><img ng-src=\"{{ item[mxFieldChildIcon] === undefined ? 'img/profile_120x120.jpg' : item[mxFieldChildIcon] }}\" alt=\"{{ item[mxFieldChildName] }}\" class=mx-profile-icon> {{ item[mxFieldChildName] }}</strong> <small><span class=detail>{{ item[mxFieldChildValue] | currency:'R$ ' }}</span> <span class=detail>{{ item[mxFieldChildPartner] }}</span></small></a></div><div class=mx-icon-card draggable=false ng-class=\"{'state-0': item[mxFieldChildState] == '0', 'state-1': item[mxFieldChildState] == 1, 'state-2': item[mxFieldChildState] == 2, 'state-3': item[mxFieldChildState] == 3, 'state-4': item[mxFieldChildState] == 4}\"><a id=activity-item-click href=\"\" class=icon ng-click=\"vm.stateClickHandler($event, item[mxFieldChildKey])\"></a></div></li></ul></td></tr></tbody></table><div id=mx-stage-actions><ul class=mx-stage-action><li class=mx-trash mx-droppable-action mx-droppable-type=trash><span></span></li><li class=mx-lose mx-droppable-action mx-droppable-type=lose><span>Perdido</span></li><li class=mx-win mx-droppable-action mx-droppable-type=win><span>Ganho</span></li></ul></div></div></td></tr></tbody></table></div>");
@@ -143,6 +151,7 @@ angular.module('mxPipeline')
       link: function postLink(scope, element, attrs, controller) {
         var elem = element[0];
         var itemId;
+        var stageAction = document.getElementById('mx-stage-actions');
 
         elem.draggable = true;
 
@@ -154,6 +163,7 @@ angular.module('mxPipeline')
             e.dataTransfer.setData('elementId', this.id);
 
             this.classList.add('drag');
+            angular.element(stageAction).addClass('open');
 
             return false;
           },
@@ -164,6 +174,9 @@ angular.module('mxPipeline')
           'dragend',
           function(e) {
             this.classList.remove('drag');
+
+            angular.element(stageAction).removeClass('open');
+
             return false;
           },
           false
@@ -174,7 +187,7 @@ angular.module('mxPipeline')
           function(e){
             itemId = angular.element(this).attr('mx-id');
 
-            controller.itemClickHandler(itemId);
+            controller.itemClickHandler(itemId, e);
 
             return false;
           },
@@ -241,14 +254,13 @@ angular.module('mxPipeline')
           'drop', 
           function(e) {
           	var fromParent = document.getElementById(e.dataTransfer.getData('parentId'));
-			var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
-      		var itemId = angular.element(itemDrop).attr('mx-id');
-      		var fromParentId = e.dataTransfer.getData('parentId');
+			      var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
+      		  var itemId = angular.element(itemDrop).attr('mx-id');
+      		  var fromParentId = e.dataTransfer.getData('parentId');
 
             this.classList.remove('over');
-            this.classList.remove('open');
 
-      		if (e.stopPropagation) {
+        		if (e.stopPropagation) {
           		e.stopPropagation();
           	}
 
@@ -256,9 +268,9 @@ angular.module('mxPipeline')
 
           	DataProvider.removeRecord(fromParentId, itemId);
 
-          	console.log(DataProvider.get());
+          	controller.onDropActionHandler(itemId, scope.mxDroppableType, e);
 
-          	//controller.onDropHandler(itemId);
+            controller.updateDataprovider();
 
           	return false;
           },
@@ -291,10 +303,6 @@ angular.module('mxPipeline')
           	if (e.preventDefault) {
           		e.preventDefault();
           	}
-
-            stageAction = document.getElementById('mx-stage-actions');
-
-            angular.element(stageAction).addClass('open');
 
           	this.classList.add('over');
 
@@ -330,11 +338,8 @@ angular.module('mxPipeline')
           	var fromParentId = e.dataTransfer.getData('parentId');
       			var itemDrop = document.getElementById(e.dataTransfer.getData('elementId'));
       			var itemId = angular.element(itemDrop).attr('mx-id');
-            var stageAction = document.getElementById('mx-stage-actions');
 
             this.classList.remove('over');
-
-            angular.element(stageAction).removeClass('open');
 
             if (this.id == fromParentId) {
               return;
@@ -348,7 +353,7 @@ angular.module('mxPipeline')
 
           	DataProvider.moveRecord(fromParentId, this.id, itemId);
 
-          	controller.onDropHandler(itemId);
+          	controller.onDropHandler(itemId, e);
 
           	return false;
           },
@@ -372,6 +377,7 @@ angular.module('mxPipeline')
       	mxOnDrop: '&mxOnDrop',
       	mxItemClick: '&mxItemClick',
       	mxItemStateClick: '&mxItemStateClick',
+        mxOnDropAction: '&mxOnDropAction',
       	mxFieldColumnKey: '@mxFieldColumnKey',
       	mxFieldColumnName: '@mxFieldColumnName',
       	mxFieldChildren: '@mxFieldChildren',
@@ -438,31 +444,43 @@ angular.module('mxPipeline')
 
     vm.validateAttrs();
 
-    vm.onDropHandler = function onDropHandler(id) {
+    vm.onDropHandler = function onDropHandler(id, event) {
       $timeout(function() {
         $scope.$apply(function(scope) {
-                var fn = scope.mxOnDrop();
+            var fn = scope.mxOnDrop();
 
-                if ('undefined' !== typeof fn) {
-                  fn(id, event);
-                }
-            });
+            if ('undefined' !== typeof fn) {
+              fn(id, event);
+            }
+        });
       });
     };
 
-    vm.itemClickHandler = function itemClickHandler(id) {
+    vm.onDropActionHandler = function onDropActionHandler(id, type, event) {
       $timeout(function() {
         $scope.$apply(function(scope) {
-                var fn = scope.mxItemClick();
+            var fn = scope.mxOnDropAction();
 
-                if ('undefined' !== typeof fn) {
-                  fn(id, event);
-                }
-            });
+            if ('undefined' !== typeof fn) {
+              fn(id, type, event);
+            }
+        });
       });
     };
 
-    vm.stateClickHandler = function stateClickHandler(event, id) {
+    vm.itemClickHandler = function itemClickHandler(id, event) {
+      $timeout(function() {
+        $scope.$apply(function(scope) {
+            var fn = scope.mxItemClick();
+
+            if ('undefined' !== typeof fn) {
+              fn(id, event);
+            }
+        });
+      });
+    };
+
+    vm.stateClickHandler = function stateClickHandler(id, event) {
       event.stopPropagation();
 
       $timeout(function() {
@@ -495,5 +513,9 @@ angular.module('mxPipeline')
       }
 
       return total;
+    };
+
+    vm.updateDataprovider = function updateDataprovider() {
+      $scope.mxDataProvider = DataProvider.get();
     };
   }]);

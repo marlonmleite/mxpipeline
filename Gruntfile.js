@@ -8,10 +8,19 @@ module.exports = function (grunt) {
 
   var config = {
     app: 'app',
-    dist: 'dist'
+    dist: 'dist',
+    banner:   '/*\n' +
+              ' * <%= pkg.name %>\n' +
+              ' * Version: <%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+              ' * Repository: <%= pkg.repository.url %> \n' +
+              ' * Bugs: <%= pkg.bugs %>\n' +
+              ' * Author: <%= pkg.author %>\n' +
+              ' */\n'
   };
 
   grunt.initConfig({
+
+    pkg: grunt.file.readJSON('package.json'),
 
     config: config,
 
@@ -48,6 +57,9 @@ module.exports = function (grunt) {
     },
 
     concat: {
+      options: {
+        banner: '<%= config.banner %>\n'
+      },
       dist: {
         src: ['<%= config.app %>/template/*.js', '<%= config.app %>/js/*.module.js', '<%= config.app %>/js/*.js'],
         dest: '<%= config.dist %>/mx-pipeline.js'
@@ -127,6 +139,13 @@ module.exports = function (grunt) {
         cwd: '<%= config.app %>/css',
         dest: '<%= config.dist %>/css/',
         src: '{,*/}*.css'
+      },
+      publishLocal: {
+        expand: true,
+        dot: true,
+        cwd: '<%= config.dist %>',
+        dest: 'D:/Desenvolvimento/github/mx-pipeline-example/app/scripts/vendor/',
+        src: '{,*/}*.js'
       }
     },
 
@@ -164,12 +183,14 @@ module.exports = function (grunt) {
     },
 
     uglify: {
-      dist: {
-        options: {
-          mangle: {
-            except: ['angular']
-          }
+      options: {
+        mangle: {
+          except: ['angular']
         },
+        banner: '<%= config.banner %>(function(){\n',
+        footer: '\n})();'
+      },
+      dist: {
         files: {
           '<%= config.dist %>/mx-pipeline.min.js': ['<%= config.dist %>/mx-pipeline.js']
         }
@@ -233,5 +254,10 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'newer:jshint',
     'build'
+  ]);
+
+  grunt.registerTask('publish', [
+    'build',
+    'copy:publishLocal'
   ]);
 };

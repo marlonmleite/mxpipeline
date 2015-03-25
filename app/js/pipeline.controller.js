@@ -45,31 +45,43 @@ angular.module('mxPipeline')
 
     vm.validateAttrs();
 
-    vm.onDropHandler = function onDropHandler(id) {
+    vm.onDropHandler = function onDropHandler(id, event) {
       $timeout(function() {
         $scope.$apply(function(scope) {
-                var fn = scope.mxOnDrop();
+            var fn = scope.mxOnDrop();
 
-                if ('undefined' !== typeof fn) {
-                  fn(id, event);
-                }
-            });
+            if ('undefined' !== typeof fn) {
+              fn(id, event);
+            }
+        });
       });
     };
 
-    vm.itemClickHandler = function itemClickHandler(id) {
+    vm.onDropActionHandler = function onDropActionHandler(id, type, event) {
       $timeout(function() {
         $scope.$apply(function(scope) {
-                var fn = scope.mxItemClick();
+            var fn = scope.mxOnDropAction();
 
-                if ('undefined' !== typeof fn) {
-                  fn(id, event);
-                }
-            });
+            if ('undefined' !== typeof fn) {
+              fn(id, type, event);
+            }
+        });
       });
     };
 
-    vm.stateClickHandler = function stateClickHandler(event, id) {
+    vm.itemClickHandler = function itemClickHandler(id, event) {
+      $timeout(function() {
+        $scope.$apply(function(scope) {
+            var fn = scope.mxItemClick();
+
+            if ('undefined' !== typeof fn) {
+              fn(id, event);
+            }
+        });
+      });
+    };
+
+    vm.stateClickHandler = function stateClickHandler(id, event) {
       event.stopPropagation();
 
       $timeout(function() {
@@ -102,5 +114,9 @@ angular.module('mxPipeline')
       }
 
       return total;
+    };
+
+    vm.updateDataprovider = function updateDataprovider() {
+      $scope.mxDataProvider = DataProvider.get();
     };
   }]);

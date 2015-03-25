@@ -12,6 +12,7 @@ angular.module('mxPipeline')
       	mxOnDrop: '&mxOnDrop',
       	mxItemClick: '&mxItemClick',
       	mxItemStateClick: '&mxItemStateClick',
+        mxOnDropAction: '&mxOnDropAction',
       	mxFieldColumnKey: '@mxFieldColumnKey',
       	mxFieldColumnName: '@mxFieldColumnName',
       	mxFieldChildren: '@mxFieldChildren',
